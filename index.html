@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="./js/main.js" async defer></script>
+    <title>to-do</title>
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+    </header>
+    <main>
+        <form>
+            <input type="text" placeholder="Lista de TO-DO"/>
+            <input type="button" value="Nueva Lista">
+        </form>
+        <div id="contanier"></div>
+    </main>
+    <template id="row-template">
+        <tr>
+            <td class="id"></td>
+            <td class="description"></td>
+            <td><input type="checkbox" class="cbox"></td>
+            <td>
+                <button class="delete btn btn-warning">Eliminar</button>
+                <button class="delete btn btn-warning">Editar</button>
+            </td>
+        </tr>
+    </template>
+</body>
+</html>
