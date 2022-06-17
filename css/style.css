@@ -1,0 +1,93 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+header{
+    border: 2px solid #cccccc;
+    border-bottom: 4px solid #cccccc;
+    height: 70px;
+}
+
+header h1{
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+main{
+    border: 2px solid #cccccc;
+    padding: 12px;
+}
+
+#list-input{
+    height: 22px;
+    padding: 2px;
+
+}
+#list-input:focus{
+    border: 2px solid #70a8ec;
+    border-radius: 2px;
+    outline: none;
+}
+
+.main-btn{
+    height: 22px;
+    width: 120px;
+}
+
+
+
+.list-container{
+    border: 1px solid #cccccc;
+    margin-top: 26px;
+    padding-left: 10px;
+}
+
+.list-container h3{
+    background-color: white;
+    font-size: 20px;
+    font-weight: 200;
+    width: fit-content;
+    margin-top: -12px;
+    margin-left: 10px;
+    display: block;
+}
+
+.list-container .delete-list-btn{
+    height: 24px;
+    width: 100px;
+    display: inline;
+    margin-left: 2px;
+    font-size: 14px;
+}
+
+.list-container div{
+    margin-top: 5px;
+}
+
+.list-container input{
+    height: 22px;
+    padding: 2px;
+}
+
+.list-container button{
+    height: 22px;
+    width: 80px;
+    display: inline;
+    margin-left: 2px;
+    font-size: 14px;
+}
+
+.list-container table td{
+    padding-left: 3px;
+    padding-right: 2px;
+}
+
+.checked{
+
+}
+
+

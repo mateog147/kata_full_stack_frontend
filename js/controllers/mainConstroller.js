@@ -1,38 +1,42 @@
+//Retorna un objeto con todas las listas.
 export const loadList = async () =>{
     const url = "http://localhost:8080/api/todolist"; 
     let json = await loadData(url);
     return json;
 }
 
+//arma la información para solicitud POST
 export const saveList = async (listName) =>{
     const url = "http://localhost:8080/api/todolist"; 
-    const json = {name:listName}
+    const json = {name:listName.toUpperCase()}
     await saveData(url,json)
 }
 
+//arma la información para solicitud DELETE
 export const deleteList = async (id) =>{
     const url = `http://localhost:8080/api/todolist/${id}`;  
     await deleteData(url);
 }
 
+//Retorna todas las tareas para una lista
 export const loadTask = async (id) =>{
     const url = `http://localhost:8080/api/todolist/${id}/task`; 
     let json = await loadData(url);
     return json;
 }
-
+//arma la información para solicitud POST
 export const saveTask = async (listId,taskName) =>{
     const url = `http://localhost:8080/api/todolist/${listId}/task`; 
     const json = {description:taskName}
     await saveData(url,json)
 }
-
+//arma la información para solicitud DELETE
 export const deleteTask = async (id) =>{
     const url = `http://localhost:8080/api/task/${id}`;  
     await deleteData(url);
 }
 
-
+//GET
 const loadData = async (url) =>{
     try {
         let res = await fetch(url)
@@ -46,7 +50,7 @@ const loadData = async (url) =>{
         return null
     }
 }
-
+//POST
 const saveData = async (url, json) =>{
     //post
     try {
@@ -67,7 +71,7 @@ const saveData = async (url, json) =>{
     }
 
 }
-
+//DELETE
 const deleteData = async (url) =>{
     //delete
     try {

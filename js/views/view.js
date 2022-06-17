@@ -1,25 +1,39 @@
-import { loadList, loadTask, saveList, deleteList, saveTask, deleteTask } from "../controllers/listConstroller.js";
+import { loadList, loadTask, saveList, deleteList, saveTask, deleteTask } from "../controllers/mainConstroller.js";
 import { markTask, updateTask, taskById } from "../controllers/taskController.js";
 
+/**
+ * Metodo para cargar la vista inical y agregar los event listener.
+ * Se usa la metodologia de listener sobre el objeto Document.
+ * Esto nos permite optimizar recurzor minimizando la cantidad de listener. 
+ */
 export const loadView = async () =>{
 
     await fillLists();
 
+    /*
+    Evento submit del formulario para crear listas
+    Se deja abierta la posibilidad de agregar nuevos formularios.
+    */
     document.addEventListener("submit",async event =>{
         event.preventDefault();
         const $listForm =  document.getElementById("list-form");
         switch (event.target) {
             case $listForm:
                 await newList();
-                break;
-        
+                break;    
             default:
                 break;
         }
     })
 
+    /*
+    Evento click.
+    Identifica el nodo del que se origina el evento.
+    Segun el origen ejecuta el metodo corrrespondiente.
+    */
     document.addEventListener("click",async event =>{
         
+        //Boton borrar de cada elemento lista.
         if(event.target.matches(".delete-list-btn")){
             event.preventDefault();
             let isDelete = confirm(`Estas seguro de eliminar a la lista?`)
@@ -28,7 +42,7 @@ export const loadView = async () =>{
                 await fillLists();
             }
         }
-
+        //Boton crear de cada lista
         else if(event.target.matches(".create-task-btn")){
             event.preventDefault();
             if(event.target.textContent != "Actualizar"){
@@ -39,45 +53,55 @@ export const loadView = async () =>{
             
         }
 
+        //Checkbox de cada tarea.
         else if(event.target.matches(".cbox")){
             await markTask(event.target.value)
+            const $btn = document.querySelector(`.edit-btn-${event.target.value}`);
+            $btn.disabled = !$btn.disabled;
         }
 
+        //Boton editar de cada tarea
         else if(event.target.matches(".edit-task-btn")){
             await updateTaskForm(event.target.dataset.listId, event.target.dataset.taskId)
         }
-
+        
+        //Boton eliminar de cada tarea.
         else if(event.target.matches(".delete-task-btn")){
             const $listContanier = document.querySelector(`.list${event.target.dataset.listId}`);
             await deleteTask(event.target.dataset.taskId);
             cleanListNode($listContanier);
             await fillTasks($listContanier, event.target.dataset.listId);
         }
-
-        
     })
 }
 
 
-
+/**
+ * Metodo para cargar las listas desde la API
+ */
 const fillLists = async () => {
-    const lists = await loadList();
+    //Contenedor del HTML
     const $container = document.getElementById("contanier");
     const $fragment = document.createDocumentFragment();
 
+    
+    const lists = await loadList();
+
     lists.forEach(list => {
         const $listContanier = document.createElement("div");
-        $listContanier.classList.add(`list${list.id}`, "list-contanier")
+        $listContanier.classList.add(`list${list.id}`, "list-container")
         const $title = document.createElement("h3");
         const $btn = document.createElement("button");
         $btn.className=("delete-list-btn")
         $btn.textContent = "Eliminar";
         $btn.dataset.id  = list.id;
         $title.innerHTML = list.name; 
+        $title.append($btn);
 
 
         const $formContanier = document.createElement("div");
         const $input = document.createElement("input");
+        $input.placeholder = "¿Qué piensas hacer?"
         $input.className = `task-input-${list.id}`
 
         const $btnNew = document.createElement("button");
@@ -85,7 +109,7 @@ const fillLists = async () => {
         $btnNew.className=("create-task-btn");
         $btnNew.textContent = "Crear";
         $formContanier.append($input, $btnNew);
-        $listContanier.append($title, $btn, $formContanier);
+        $listContanier.append($title, $formContanier);
 
         fillTasks($listContanier, list.id);
         $fragment.appendChild($listContanier)
@@ -94,6 +118,11 @@ const fillLists = async () => {
     $container.appendChild($fragment);
 }
 
+/**
+ * Alimenta la tabla de tareas de una lista.
+ * @param {htmlNode} $div contenedor de la lista
+ * @param {number} id  id de la lista
+ */
 const fillTasks = async ($div, id) =>{
     const $table = document.createElement("table");
     const $template = document.getElementById("row-template").content;
@@ -114,35 +143,45 @@ const fillTasks = async ($div, id) =>{
 
     const tasks = await loadTask(id)
     tasks.forEach(task => {
-        $template.querySelector(".id").textContent = task.id;
-        $template.querySelector(".description").textContent = task.description;
-        $template.querySelector(".cbox").checked = task.complete;
-        $template.querySelector(".cbox").value = task.id;
-
-        $template.querySelector(".edit-task-btn").dataset.listId = id;
-        $template.querySelector(".edit-task-btn").dataset.taskId = task.id;
-        $template.querySelector(".edit-task-btn").classList.add(`edit-btn-id`);
-
-        $template.querySelector(".delete-task-btn").dataset.listId = id;
-        $template.querySelector(".delete-task-btn").dataset.taskId = task.id;
-        $template.querySelector(".delete-task-btn").classList.add(`edit-btn-id`);
-
         let $clone = document.importNode($template,true);
+        $clone.querySelector(".id").textContent = task.id;
+        $clone.querySelector(".description").textContent = task.description;
+        $clone.querySelector(".cbox").checked = task.complete;
+        $clone.querySelector(".cbox").value = task.id;
+
+        $clone.querySelector(".edit-task-btn").dataset.listId = id;
+        $clone.querySelector(".edit-task-btn").dataset.taskId = task.id;
+        $clone.querySelector(".edit-task-btn").classList.add(`edit-btn-${task.id}`);
+        $clone.querySelector(".edit-task-btn").disabled = task.complete
+
+        $clone.querySelector(".delete-task-btn").dataset.listId = id;
+        $clone.querySelector(".delete-task-btn").dataset.taskId = task.id;
+        $clone.querySelector(".delete-task-btn").classList.add(`edit-btn-id`);
+
+        
         $table.appendChild($clone);
     });
     $div.appendChild($table);
 }
 
+/**
+ * Pasa los datos para crear una nueva lista
+ */
 const newList = async () =>{
     const $name = document.querySelector("#list-input");
     if(!$name.value){
         alert("Ingresa un nombre para la lista")
     }else{
-        saveList($name.value);
+        await saveList($name.value);
         await fillLists();
+        $name.value = ""
     }
 }
 
+/**
+ * Pasa la informacion para crear una tarea
+ * @param {number} listId id de la lista a ser agregada
+ */
 const newTask = async (listId) =>{
     const $des = document.querySelector(`.task-input-${listId}`);
     const $listContanier = document.querySelector(`.list${listId}`);
@@ -152,9 +191,14 @@ const newTask = async (listId) =>{
         await saveTask(listId,$des.value);
         cleanListNode($listContanier);
         await fillTasks($listContanier, listId);
+        $des.value =""
     }
 }
 
+/**
+ * pasa la información para actualizar la información de una tarea.
+ * @param {number} listId id de la lista a la que pertenece la tarea.
+ */
 const updateTaskInfo = async (listId)=>{
     const $des = document.querySelector(`.task-input-${listId}`);
     const $listContanier = document.querySelector(`.list${listId}`);
@@ -163,6 +207,7 @@ const updateTaskInfo = async (listId)=>{
     if(!$des.value){
         alert("Ingresa un texto para la tarea")
     }else{
+        //En el dataset de la entrada de texto se guarda el id de la tarea
         await updateTask($des.dataset.id,$des.value);
         cleanListNode($listContanier);
         await fillTasks($listContanier, listId);
@@ -174,6 +219,11 @@ const updateTaskInfo = async (listId)=>{
 
 }
 
+/**
+ * Trae la información de la tarea y la pone en el formulario del elemento lista.
+ * @param {number} listId 
+ * @param {number} taskId 
+ */
 const updateTaskForm = async (listId, taskId) =>{
     const $des = document.querySelector(`.task-input-${listId}`);
     const $listContanier = document.querySelector(`.list${listId}`);
@@ -186,12 +236,14 @@ const updateTaskForm = async (listId, taskId) =>{
 
 }
 
+//Limpia el nodo pasado por parametro
 const cleanNode =  (parent) =>{
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
     }
 }
 
+/**quita la tabla de elemento lista */
 const cleanListNode =  (parent) =>{
     parent.childNodes.forEach(c=>{
     

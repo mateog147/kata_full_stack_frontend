@@ -1,3 +1,4 @@
+//Cambia el estatus de IsComplete para una tarea por id
 export const markTask = async (taskId) =>{
     const url = `http://127.0.0.1:8080/api/task/complete/${taskId}`; 
     const json = {}
@@ -5,6 +6,7 @@ export const markTask = async (taskId) =>{
     await updateData(url,json)
 }
 
+//Actualiza la descripción de una tarea por id.
 export const updateTask = async (taskId, taskName) =>{
     const url = `http://127.0.0.1:8080/api/task/${taskId}`; 
     const json = {description:taskName}
@@ -12,6 +14,8 @@ export const updateTask = async (taskId, taskName) =>{
     await updateData(url,json)
 }
 
+//GET
+//Retorna por id
 export const taskById = async (id) =>{
         const url = `http://localhost:8080/api/task/${id}`
         try {
