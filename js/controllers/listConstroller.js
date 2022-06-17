@@ -4,12 +4,6 @@ export const loadList = async () =>{
     return json;
 }
 
-export const loadTask = async (id) =>{
-    const url = `http://localhost:8080/api/todolist/${id}/task`; 
-    let json = await loadData(url);
-    return json;
-}
-
 export const saveList = async (listName) =>{
     const url = "http://localhost:8080/api/todolist"; 
     const json = {name:listName}
@@ -18,6 +12,23 @@ export const saveList = async (listName) =>{
 
 export const deleteList = async (id) =>{
     const url = `http://localhost:8080/api/todolist/${id}`;  
+    await deleteData(url);
+}
+
+export const loadTask = async (id) =>{
+    const url = `http://localhost:8080/api/todolist/${id}/task`; 
+    let json = await loadData(url);
+    return json;
+}
+
+export const saveTask = async (listId,taskName) =>{
+    const url = `http://localhost:8080/api/todolist/${listId}/task`; 
+    const json = {description:taskName}
+    await saveData(url,json)
+}
+
+export const deleteTask = async (id) =>{
+    const url = `http://localhost:8080/api/task/${id}`;  
     await deleteData(url);
 }
 

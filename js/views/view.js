@@ -1,4 +1,5 @@
-import { loadList, loadTask, saveList, deleteList } from "../controllers/listConstroller.js";
+import { loadList, loadTask, saveList, deleteList, saveTask, deleteTask } from "../controllers/listConstroller.js";
+import { markTask, updateTask, taskById } from "../controllers/taskController.js";
 
 export const loadView = async () =>{
 
@@ -18,17 +19,46 @@ export const loadView = async () =>{
     })
 
     document.addEventListener("click",async event =>{
-        event.preventDefault();
-
+        
         if(event.target.matches(".delete-list-btn")){
+            event.preventDefault();
             let isDelete = confirm(`Estas seguro de eliminar a la lista?`)
             if(isDelete){
                 await deleteList(event.target.dataset.id);
                 await fillLists();
             }
         }
+
+        else if(event.target.matches(".create-task-btn")){
+            event.preventDefault();
+            if(event.target.textContent != "Actualizar"){
+                newTask(event.target.dataset.id)
+            }else{
+                updateTaskInfo(event.target.dataset.id);
+            }
+            
+        }
+
+        else if(event.target.matches(".cbox")){
+            await markTask(event.target.value)
+        }
+
+        else if(event.target.matches(".edit-task-btn")){
+            await updateTaskForm(event.target.dataset.listId, event.target.dataset.taskId)
+        }
+
+        else if(event.target.matches(".delete-task-btn")){
+            const $listContanier = document.querySelector(`.list${event.target.dataset.listId}`);
+            await deleteTask(event.target.dataset.taskId);
+            cleanListNode($listContanier);
+            await fillTasks($listContanier, event.target.dataset.listId);
+        }
+
+        
     })
 }
+
+
 
 const fillLists = async () => {
     const lists = await loadList();
@@ -48,7 +78,11 @@ const fillLists = async () => {
 
         const $formContanier = document.createElement("div");
         const $input = document.createElement("input");
+        $input.className = `task-input-${list.id}`
+
         const $btnNew = document.createElement("button");
+        $btnNew.dataset.id  = list.id;
+        $btnNew.className=("create-task-btn");
         $btnNew.textContent = "Crear";
         $formContanier.append($input, $btnNew);
         $listContanier.append($title, $btn, $formContanier);
@@ -85,6 +119,14 @@ const fillTasks = async ($div, id) =>{
         $template.querySelector(".cbox").checked = task.complete;
         $template.querySelector(".cbox").value = task.id;
 
+        $template.querySelector(".edit-task-btn").dataset.listId = id;
+        $template.querySelector(".edit-task-btn").dataset.taskId = task.id;
+        $template.querySelector(".edit-task-btn").classList.add(`edit-btn-id`);
+
+        $template.querySelector(".delete-task-btn").dataset.listId = id;
+        $template.querySelector(".delete-task-btn").dataset.taskId = task.id;
+        $template.querySelector(".delete-task-btn").classList.add(`edit-btn-id`);
+
         let $clone = document.importNode($template,true);
         $table.appendChild($clone);
     });
@@ -101,12 +143,64 @@ const newList = async () =>{
     }
 }
 
+const newTask = async (listId) =>{
+    const $des = document.querySelector(`.task-input-${listId}`);
+    const $listContanier = document.querySelector(`.list${listId}`);
+    if(!$des.value){
+        alert("Ingresa un texto para la tarea")
+    }else{
+        await saveTask(listId,$des.value);
+        cleanListNode($listContanier);
+        await fillTasks($listContanier, listId);
+    }
+}
+
+const updateTaskInfo = async (listId)=>{
+    const $des = document.querySelector(`.task-input-${listId}`);
+    const $listContanier = document.querySelector(`.list${listId}`);
+    const $btn = $listContanier.querySelector(".create-task-btn");
+    
+    if(!$des.value){
+        alert("Ingresa un texto para la tarea")
+    }else{
+        await updateTask($des.dataset.id,$des.value);
+        cleanListNode($listContanier);
+        await fillTasks($listContanier, listId);
+        $btn.textContent ="Crear";
+        $des.value=("");
+        
+    }
+
+
+}
+
+const updateTaskForm = async (listId, taskId) =>{
+    const $des = document.querySelector(`.task-input-${listId}`);
+    const $listContanier = document.querySelector(`.list${listId}`);
+    const $btn = $listContanier.querySelector(".create-task-btn");
+    $btn.textContent ="Actualizar";
+    $des.dataset.id =taskId;
+
+    const task = await taskById(taskId);
+    $des.value = await task.description;
+
+}
+
 const cleanNode =  (parent) =>{
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
     }
 }
 
+const cleanListNode =  (parent) =>{
+    parent.childNodes.forEach(c=>{
+    
+        if(c.tagName  == 'TABLE'){
+            parent.removeChild(c);
+        }
+    
+    });
+}
 
 
 
