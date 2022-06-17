@@ -1,16 +1,48 @@
-import { loadList, loadTask } from "../controllers/listConstroller.js";
+import { loadList, loadTask, saveList, deleteList } from "../controllers/listConstroller.js";
 
 export const loadView = async () =>{
-    const $container = document.getElementById("contanier");
-    
 
+    await fillLists();
+
+    document.addEventListener("submit",async event =>{
+        event.preventDefault();
+        const $listForm =  document.getElementById("list-form");
+        switch (event.target) {
+            case $listForm:
+                await newList();
+                break;
+        
+            default:
+                break;
+        }
+    })
+
+    document.addEventListener("click",async event =>{
+        event.preventDefault();
+
+        if(event.target.matches(".delete-list-btn")){
+            let isDelete = confirm(`Estas seguro de eliminar a la lista?`)
+            if(isDelete){
+                await deleteList(event.target.dataset.id);
+                await fillLists();
+            }
+        }
+    })
+}
+
+const fillLists = async () => {
     const lists = await loadList();
-    
+    const $container = document.getElementById("contanier");
+    const $fragment = document.createDocumentFragment();
+
     lists.forEach(list => {
         const $listContanier = document.createElement("div");
+        $listContanier.classList.add(`list${list.id}`, "list-contanier")
         const $title = document.createElement("h3");
         const $btn = document.createElement("button");
+        $btn.className=("delete-list-btn")
         $btn.textContent = "Eliminar";
+        $btn.dataset.id  = list.id;
         $title.innerHTML = list.name; 
 
 
@@ -22,8 +54,10 @@ export const loadView = async () =>{
         $listContanier.append($title, $btn, $formContanier);
 
         fillTasks($listContanier, list.id);
-        $container.appendChild($listContanier)
+        $fragment.appendChild($listContanier)
     });
+    cleanNode($container)
+    $container.appendChild($fragment);
 }
 
 const fillTasks = async ($div, id) =>{
@@ -54,6 +88,30 @@ const fillTasks = async ($div, id) =>{
         let $clone = document.importNode($template,true);
         $table.appendChild($clone);
     });
-
     $div.appendChild($table);
 }
+
+const newList = async () =>{
+    const $name = document.querySelector("#list-input");
+    if(!$name.value){
+        alert("Ingresa un nombre para la lista")
+    }else{
+        saveList($name.value);
+        await fillLists();
+    }
+}
+
+const cleanNode =  (parent) =>{
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
+
+
+
+
+
+
+
+
