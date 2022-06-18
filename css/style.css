@@ -8,13 +8,22 @@
 header{
     border: 2px solid #cccccc;
     border-bottom: 4px solid #cccccc;
-    height: 70px;
+    height: 80px;
+    justify-content: space-between;
 }
 
-header h1{
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+header h2{
+    width:200px;
+    margin: 0;
+    display: inline-block;
+    margin-left: 35%;
+    
+}
+
+header img{
+    height: 90%;
+    width: auto;
+    display: inline-block;
 }
 
 main{
@@ -22,28 +31,21 @@ main{
     padding: 12px;
 }
 
-#list-input{
-    height: 22px;
-    padding: 2px;
-
+main #list-form{
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
-#list-input:focus{
-    border: 2px solid #70a8ec;
-    border-radius: 2px;
-    outline: none;
-}
-
-.main-btn{
-    height: 22px;
-    width: 120px;
-}
-
 
 
 .list-container{
     border: 1px solid #cccccc;
     margin-top: 26px;
+    margin-left: auto;
+    margin-right: auto;
     padding-left: 10px;
+    padding-right: 10px;
+    width: 50%;
 }
 
 .list-container h3{
@@ -57,28 +59,20 @@ main{
 }
 
 .list-container .delete-list-btn{
-    height: 24px;
-    width: 100px;
+
     display: inline;
-    margin-left: 2px;
-    font-size: 14px;
+    margin-left: 5px;
+
 }
 
 .list-container div{
     margin-top: 5px;
 }
 
-.list-container input{
-    height: 22px;
-    padding: 2px;
-}
+
 
 .list-container button{
-    height: 22px;
-    width: 80px;
     display: inline;
-    margin-left: 2px;
-    font-size: 14px;
 }
 
 .list-container table td{
@@ -87,7 +81,7 @@ main{
 }
 
 .checked{
-
+    text-decoration: line-through;
 }
 
 

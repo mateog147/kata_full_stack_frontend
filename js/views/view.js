@@ -57,6 +57,10 @@ export const loadView = async () =>{
         else if(event.target.matches(".cbox")){
             await markTask(event.target.value)
             const $btn = document.querySelector(`.edit-btn-${event.target.value}`);
+            const $id = document.querySelector(`.id-td-${event.target.value}`);
+            const $descrip = document.querySelector(`.des-td-${event.target.value}`);
+            $id.classList.toggle("checked");
+            $descrip.classList.toggle("checked");
             $btn.disabled = !$btn.disabled;
         }
 
@@ -92,7 +96,7 @@ const fillLists = async () => {
         $listContanier.classList.add(`list${list.id}`, "list-container")
         const $title = document.createElement("h3");
         const $btn = document.createElement("button");
-        $btn.className=("delete-list-btn")
+        $btn.classList.add("delete-list-btn", "btn" , "btn-danger");
         $btn.textContent = "Eliminar";
         $btn.dataset.id  = list.id;
         $title.innerHTML = list.name; 
@@ -100,13 +104,14 @@ const fillLists = async () => {
 
 
         const $formContanier = document.createElement("div");
+        $formContanier.classList.add("input-group", "mb-3")
         const $input = document.createElement("input");
         $input.placeholder = "¿Qué piensas hacer?"
-        $input.className = `task-input-${list.id}`
+        $input.classList.add(`task-input-${list.id}`, "form-control") 
 
         const $btnNew = document.createElement("button");
         $btnNew.dataset.id  = list.id;
-        $btnNew.className=("create-task-btn");
+        $btnNew.classList.add("btn", "btn-outline-secondary","create-task-btn");
         $btnNew.textContent = "Crear";
         $formContanier.append($input, $btnNew);
         $listContanier.append($title, $formContanier);
@@ -125,6 +130,7 @@ const fillLists = async () => {
  */
 const fillTasks = async ($div, id) =>{
     const $table = document.createElement("table");
+    $table.classList.add("table", "table-striped")
     const $template = document.getElementById("row-template").content;
 
     //creamos la cabecera 
@@ -145,7 +151,9 @@ const fillTasks = async ($div, id) =>{
     tasks.forEach(task => {
         let $clone = document.importNode($template,true);
         $clone.querySelector(".id").textContent = task.id;
+        $clone.querySelector(".id").classList.add(`id-td-${task.id}`);
         $clone.querySelector(".description").textContent = task.description;
+        $clone.querySelector(".description").classList.add(`des-td-${task.id}`);
         $clone.querySelector(".cbox").checked = task.complete;
         $clone.querySelector(".cbox").value = task.id;
 
@@ -158,6 +166,11 @@ const fillTasks = async ($div, id) =>{
         $clone.querySelector(".delete-task-btn").dataset.taskId = task.id;
         $clone.querySelector(".delete-task-btn").classList.add(`edit-btn-id`);
 
+        //Si la tarea esta completada se asigno la clase checked a id y description
+        if( task.complete){
+            $clone.querySelector(".id").classList.toggle('checked');
+            $clone.querySelector(".description").classList.toggle('checked');
+        }
         
         $table.appendChild($clone);
     });
